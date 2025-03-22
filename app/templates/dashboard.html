@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Secure File Sharing{% endblock %}
+
+{% block content %}
+<div class="text-center">
+  <h1>Welcome to your Dashboard!</h1>
+  <p>Your User ID: {{ session.get('user_id') }}</p>
+</div>
+<!-- Uploaded Files Section -->
+<div class="mt-4">
+  <h3>Your Uploaded Files</h3>
+  <ul class="list-group">
+    {% for file in files %}
+      <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <span>{{ file.original_name }}</span>
+        <div class="mt-2 mt-md-0">
+          <!-- Download -->
+          <a href="{{ url_for('files.download_file', file_id=file.id) }}" class="btn btn-success btn-sm">Download</a>
+          <!-- Raw Download -->
+          <!-- <a href="{{ url_for('files.download_raw', file_id=file.id) }}" class="btn btn-secondary btn-sm">Raw</a> -->
+
+          <!-- Grant Access Form -->
+          <form action="{{ url_for('files.grant_access', file_id=file.id) }}" method="POST" class="d-inline-block ms-2">
+            <div class="input-group input-group-sm">
+              <input type="text" name="username" class="form-control" placeholder="Username" required>
+              <button class="btn btn-primary" type="submit">Share</button>
+            </div>
+          </form>
+
+          <!-- Revoke Access Form (Optional) -->
+          <form action="{{ url_for('files.revoke_access', file_id=file.id) }}" method="POST" class="d-inline-block ms-2">
+            <div class="input-group input-group-sm">
+              <input type="text" name="username" class="form-control" placeholder="Username" required>
+              <button class="btn btn-danger" type="submit">Revoke</button>
+            </div>
+          </form>
+
+          <!-- Generate Public Link -->
+          <form action="{{ url_for('files.generate_share', file_id=file.id) }}" method="POST" class="d-inline-block ms-2">
+            <button type="submit" class="btn btn-info btn-sm">Generate Link</button>
+          </form>
+        </div>
+      </li>
+    {% else %}
+      <li class="list-group-item">You haven't uploaded any files yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+<!-- Shared With You Section -->
+<div class="mt-5">
+  <h3>Files Shared With You</h3>
+  <ul class="list-group">
+    {% for file, owner_name in shared_files %}
+    <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center">
+      <span>{{ file.original_name }}</span>
+      <div class="mt-2 mt-md-0">
+        <!-- Download -->
+        <a href="{{ url_for('files.download_file', file_id=file.id) }}" class="btn btn-success btn-sm">Download</a>
+        <!-- Raw Download -->
+        <!-- <a href="{{ url_for('files.download_raw', file_id=file.id) }}" class="btn btn-secondary btn-sm">Raw</a> -->
+
+        <!-- Generate Public Link -->
+        <form action="{{ url_for('files.generate_share', file_id=file.id) }}" method="POST" class="d-inline-block ms-2">
+          <button type="submit" class="btn btn-info btn-sm">Generate Link</button>
+        </form>
+      </div>
+    </li>
+    {% else %}
+      <li class="list-group-item">No files shared with you.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
